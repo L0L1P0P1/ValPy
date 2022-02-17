@@ -3,7 +3,7 @@ from collections import OrderedDict
 import re
 import socket
 
-class Auth:
+class VALauth:
 
     def __init__(self, username, password):
         self.username = str(username)
@@ -24,6 +24,7 @@ class Auth:
         session = requests.session()
         session.headers = headers
 
+        # Auth Cookies
         data = {
             'client_id': 'play-valorant-web-prod',
             'nonce': '1',
@@ -33,6 +34,7 @@ class Auth:
 
         r = session.post(f'https://{address}/api/v1/authorization', json=data, headers=headers, verify=False)
 
+        # Auth Request
         data = {
             'type': 'auth',
             'username': self.username,
@@ -42,8 +44,8 @@ class Auth:
         pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
         data = pattern.findall(r.json()['response']['parameters']['uri'])[0] 
         access_token = data[0]
-        # print('Access Token: ' + access_token)
-
+        
+        # Entitlement
         headers = {
             'Accept-Encoding': 'gzip, deflate, br',
             'Host': "entitlements.auth.riotgames.com",
@@ -54,6 +56,7 @@ class Auth:
         entitlements_token = r.json()['entitlements_token']
         # print('Entitlements Token: ' + entitlements_token)
 
+        # Player Info
         headers = {
             'Accept-Encoding': 'gzip, deflate, br',
             'Host': "auth.riotgames.com",
@@ -67,4 +70,4 @@ class Auth:
         headers['X-Riot-Entitlements-JWT'] = entitlements_token
         del headers['Host']
         session.close()
-        return user_id, headers, {}
+        return user_id, headers
