@@ -41,6 +41,14 @@ class VALauth:
             'password': self.password
         }
         r = session.put(f'https://{address}/api/v1/authorization', json=data, headers=headers, verify=False)
+        if r.json()['data']['type'] == "multifactor":
+            email = r.json()['data']['multifactor']['email']
+            code = input(f'Please Enter The Code Sent to {email}: ')
+            data = {
+                "type": "multifactor",
+                "code": code,
+                "rememberDevice": False
+            }
         pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
         data = pattern.findall(r.json()['response']['parameters']['uri'])[0] 
         access_token = data[0]
