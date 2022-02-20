@@ -4,33 +4,33 @@ import json
 import pip._vendor.requests as requests
 import re
 from collections import OrderedDict
+import urllib3
 
 
-
-
-
-class VALpy:
-
-    regions = ['eu', 'na', 'ap', 'ko']
+urllib3.disable_warnings()
+class ValPy:
 
     def __init__(self):
+        regions = ['eu', 'na', 'ap', 'ko']
         r = requests.get('https://valorant-api.com/v1/version')
         self.version = r.json()['data']
         self.authenticated = False
 
     def Authenticate(self, username, password, region):
+        self.region = str(region).lower()
         self.username = str(username)
         self.password = str(password)
 
-        if self.regions.count(region) == 0:
+        if self.region.count(self.region) == 0:
             print('Invalid Region!')
             return 0
       
         if self.authenticated == False:
 
             # gets address info with "socket"
-            addrinfo = socket.getaddrinfo('auth.riotgames.com', 443)
-            (family, type, proto, canonname, (address, port)) = addrinfo[0]
+#            addrinfo = socket.getaddrinfo('auth.riotgames.com', 443)
+#            (family, type, proto, canonname, (address, port)) = addrinfo[0]
+            address = 'auth.riotgames.com'
 
             # Headers
             headers = OrderedDict({
@@ -50,7 +50,7 @@ class VALpy:
                 'response_type': 'token id_token',
             }
 
-            r = session.post(f'https://{address}/api/v1/authorization', json=data, headers=headers, verify=False)
+            r = session.post(f'https://{address}/api/v1/authorization', json=data, headers=headers)
 
             # Auth Request
             data = {
@@ -58,17 +58,17 @@ class VALpy:
                 'username': self.username,
                 'password': self.password
             }
-            r = session.put(f'https://{address}/api/v1/authorization', json=data, headers=headers, verify=False)
-
+            r = session.put(f'https://{address}/api/v1/authorization', json=data, headers=headers)
             # 2 FAC
-            if r.json()['data']['type'] == "multifactor":
-                email = r.json()['data']['multifactor']['email']
+            if r.json()['type'] == "multifactor":
+                email = r.json()['multifactor']['email']
                 code = input(f'Please Enter The Code Sent to {email}: ')
                 data = {
                     "type": "multifactor",
                     "code": code,
                     "rememberDevice": False
                 }
+                r = session.put(f'https://{address}/api/v1/authorization', json=data, headers=headers)
         
             pattern = re.compile('access_token=((?:[a-zA-Z]|\d|\.|-|_)*).*id_token=((?:[a-zA-Z]|\d|\.|-|_)*).*expires_in=(\d*)')
             data = pattern.findall(r.json()['response']['parameters']['uri'])[0] 
@@ -113,8 +113,8 @@ class VALpy:
             print('Not Authenticated!, Use <classname>.Authenticate(<username>, <password>, <region>) first!')
             return 0
 
-        r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userid}', headers=self.headers, verify=False)
-        r = json.dumps(r.json()['data'])
+        r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userid}', headers=self.headers)
+        r = json.dumps(r.json())
         return r
 
     def GetStoreJSON(self):
@@ -122,19 +122,19 @@ class VALpy:
             print('Not Authenticated!, Use <classname>.Authenticate(<username>, <password>, <region>) first!')
             return 0
 
-        r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userid}', headers=self.headers, verify=False)
-        return r.json()['data']
+        r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userid}', headers=self.headers)
+        r = r.json()
+        return r
         
-
-
     def FetchWeapons(self):
-        r = requests.get('https://valorant-api.com/v1/weapons',verify=False)
+        r = requests.get('https://valorant-api.com/v1/weapons')
         r = json.dumps(r.json()['data'])
         return r
 
     def FetchWeaponsJSON(self):
-        r = requests.get('https://valorant-api.com/v1/weapons',verify=False)
-        return r.json()['data']
+        r = requests.get('https://valorant-api.com/v1/weapons')
+        r = r.json()['data']
+        return r
 
 
 
