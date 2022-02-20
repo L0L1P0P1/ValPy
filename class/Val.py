@@ -1,10 +1,12 @@
 import datetime
 import socket
+import json
 import pip._vendor.requests as requests
 import re
 from collections import OrderedDict
-from VALauth import VALauth
-from VALstore import VALstore
+
+
+
 
 
 class VALpy:
@@ -112,8 +114,8 @@ class VALpy:
             return 0
 
         r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userid}', headers=self.headers, verify=False)
-        r = r['data']
-        return r.text
+        r = json.dumps(r.json()['data'])
+        return r
 
     def GetStoreJSON(self):
         if self.authenticated == False:
@@ -121,20 +123,18 @@ class VALpy:
             return 0
 
         r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userid}', headers=self.headers, verify=False)
-        r = r['data']
-        return r.json()
+        return r.json()['data']
         
 
 
     def FetchWeapons(self):
         r = requests.get('https://valorant-api.com/v1/weapons',verify=False)
-        weapons = open('weapons.txt', 'w')
-        weapons.write(r.text)
-        weapons.close()
-        return r.text
+        r = json.dumps(r.json()['data'])
+        return r
 
-
-
+    def FetchWeaponsJSON(self):
+        r = requests.get('https://valorant-api.com/v1/weapons',verify=False)
+        return r.json()['data']
 
 
 
