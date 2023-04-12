@@ -3,7 +3,7 @@ from ValPy import Val
 
 def main():
     val = Val.ValPy()
-    val.Authenticate('L0L4P0P4', 'mina1343', 'eu')
+    val.Authenticate('YOUR USERNAME', 'YOUR PASSWORD', 'YOUR ACCOUNT REGION')
     store = val.GetStoreJSON()
     weapons = val.FetchWeaponsJSON()
 
