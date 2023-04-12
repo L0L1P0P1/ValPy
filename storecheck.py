@@ -2,20 +2,17 @@ from ValPy import Val
 
 
 def main():
-    val = Val.ValPy()
+
     val.Authenticate('YOUR USERNAME', 'YOUR PASSWORD', 'YOUR ACCOUNT REGION')
+    val = Val.ValPy() 
+    
     store = val.GetStoreJSON()
     weapons = val.FetchWeaponsJSON()
-
-    itemindex = 0
-    weaponindex = 0
-    skinindex = 0
     storeskin = []
 
     for i in store["SkinsPanelLayout"]["SingleItemOffers"]:
         for w in weapons:
             for s in w["skins"]:
-#                print(s["displayName"])
                 if i == s["levels"][0]["uuid"]:
                     storeskin.append(s["displayName"])
 
